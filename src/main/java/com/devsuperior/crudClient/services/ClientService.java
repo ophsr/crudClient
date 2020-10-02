@@ -1,8 +1,11 @@
 package com.devsuperior.crudClient.services;
 
+import java.util.Optional;
+
 import com.devsuperior.crudClient.dto.ClientDTO;
 import com.devsuperior.crudClient.entities.Client;
 import com.devsuperior.crudClient.repositories.ClientRepository;
+import com.devsuperior.crudClient.services.exceptions.ResourceNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,5 +22,14 @@ public class ClientService {
     public Page<ClientDTO> findAll(PageRequest pageRequest){
         Page<Client> list = repository.findAll(pageRequest);
         return list.map(entity -> new ClientDTO(entity));
+    }
+
+    @Transactional(readOnly = true)
+    public ClientDTO findById(Long id){
+        Optional<Client> obj = repository.findById(id);
+
+        Client entity = obj.orElseThrow(() -> new ResourceNotFoundException("Entity not found"));
+
+        return new ClientDTO(entity);
     }
 }
